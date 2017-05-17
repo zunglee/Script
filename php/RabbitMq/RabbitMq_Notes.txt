@@ -1,0 +1,18 @@
+RabbitMQ :
+1.)  RabbitMQ is a message broker: it accepts and forwards messages.
+2.)  A queue is only bound by the host's memory & disk limits
+3.) Many producers can send messages that go to one queue, and many consumers can try to receive data from one queue.
+4.) Consuming has a similar meaning to receiving. A consumer is a program that mostly waits to receive messages
+    ** producer, consumer, and broker do not have to reside on the same host; indeed in most applications they don't
+
+
+Worker Que is defined to distirbute among multiple workers , it is done to avoid doing a resource-intensive task immediately 
+and having to wait for it to complete.
+This concept is especially useful in web applications where it's impossible to handle a complex task during a short HTTP request window.
+  -it schedule the task to be done later
+use case : to handle a complex task during a short http request window.
+            ex: resize image or parse pdf
+
+
+
+
