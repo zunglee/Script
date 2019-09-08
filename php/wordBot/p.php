@@ -15,11 +15,13 @@ catch(PDOException $e)
     echo "Connection failed: " . $e->getMessage();
     }
 
+
 $notEnded = true;
 $wordId = $argv[1];
 $level = $argv[2];
+$tag =  $argv[3];
 
-
+$total = 0;
 while($notEnded){
 getData($wordId);
 }
@@ -46,15 +48,19 @@ curl_close ($ch);
 
 
 function insertIntoDb($json){
-global $conn , $level , $wordId;
+global $argv ,$total, $conn , $notEnded , $level , $wordId , $tag;
 $jsonArr = json_decode($json, true);
 print_R($jsonArr);
+
 if(count($jsonArr) < 15){
 $notEnded = false;
+echo $argv[3] . "--ENDED";
+
 }else{
  $wordId =  $jsonArr[14]["Id"];
 }
 foreach($jsonArr as $data){
+$total++;
 $WordText = addslashes($data["WordText"]);
 $partofspeech = addslashes($data["partofspeech"]);
 $definition = addslashes($data["definition"]);
@@ -62,9 +68,11 @@ $Synonym = addslashes($data["Synonym"]);
 $Antonym  = addslashes($data["Antonym"]);
 $imageTag = addslashes($data["imageTag"]);
 $root_present = addslashes($data["root_present"]);
+$UsageText = addslashes($data["UsageText"]);
+$tag = $tag . "|";
 
 
-$sql = "INSERT INTO WORD_BOT(WordText,partofspeech,definition,Synonym,Antonym,imageTag,root_present , level) VALUE ('$WordText','$partofspeech','$definition','$Synonym','$Antonym','$imageTag','$root_present' , $level)";
+$sql = "INSERT INTO WORD_BOT(WordText,partofspeech,definition,Synonym,Antonym,imageTag,root_present , level , tag,UsageText) VALUE ('$WordText','$partofspeech','$definition','$Synonym','$Antonym','$imageTag','$root_present' , $level , '$tag' , '$UsageText' ) ON DUPLICATE KEY UPDATE UsageText='$UsageText', tag=CONCAT('$tag' , tag) ";
 
 
 try{
@@ -74,10 +82,15 @@ if ($conn->query($sql) === TRUE) {
     echo  $conn->error;
 }
 }catch(Exception $ex){
+print_r($sql);die;
 echo $ex;
 continue;
 }
 }
+ if(count($jsonArr) < 15){
+  echo $argv[3] . "--ENDED";
+  echo "total words = ". $total;
+  }
 //print_R($jsonArr);
 }
 
